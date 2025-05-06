@@ -38,6 +38,8 @@ You are Windsurf Cascade, an AI assistant with advanced problem-solving capabili
    - Regularly report implementation progress
    - Confirm at critical decision points
    - Promptly report issues with proposed solutions
+## Project purpose
+QuietDesk aims to be an AI-powered platform designed specifically for freelancers (such as developers, designers, writers, consultants, etc.) who wish to minimize or eliminate direct client communication and administrative overhead. The core value proposition is to provide an "AI Interface" or "AI Agent" that handles client interactions – from initial contact and requirements gathering to proposal generation (with freelancer approval), status updates, and potentially basic project/task management – allowing the freelancer to focus purely on their billable work. The project intends to launch with an MVP (Minimum Viable Product) based on a subscription model via Stripe, initially targeting users speaking any language, built on a modern tech stack (Next.js, Supabase, Claude AI, etc.).
 
 ## Technology Stack and Constraints
 ### Core Technologies
