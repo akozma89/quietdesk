@@ -7,9 +7,50 @@ on:
     branches: ['**']
 
 jobs:
-  lint-format-check:
-    name: Lint and Format Check
+  setup:
+    name: Setup
     runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.value }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Generate cache key
+        id: cache-key
+        run: echo "value=${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}" >> $GITHUB_OUTPUT
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.0.0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+      
+      - name: Cache dependencies
+        id: cache-deps
+        uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: ${{ steps.cache-key.outputs.value }}
+      
+      - name: Install dependencies
+        if: ${{ steps.cache-deps.outputs.cache-hit != 'true' }}
+        run: pnpm install
+
+  checks:
+    name: ${{ matrix.check }} Check
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        check: [lint, format, type]
     
     steps:
       - name: Checkout code
@@ -26,14 +67,16 @@ jobs:
           node-version: '18'
           cache: 'pnpm'
       
-      - name: Install dependencies
-        run: pnpm install
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: ${{ needs.setup.outputs.cache-key }}
       
-      - name: Check formatting
-        run: pnpm format:check
-        
-      - name: Run lint check
-        run: pnpm lint:check
-        
-      - name: Check types
-        run: pnpm ts:check
+      - name: Run ${{ matrix.check }} check
+        run: |
+          case ${{ matrix.check }} in
+            lint) pnpm lint:check ;;
+            format) pnpm format:check ;;
+            type) pnpm ts:check ;;
+          esac
