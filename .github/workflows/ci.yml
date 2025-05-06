@@ -44,13 +44,13 @@ jobs:
         run: pnpm install
 
   checks:
-    name: ${{ matrix.check }} Check
+    name: Check ${{ matrix.check }}
     needs: setup
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        check: [lint, format, type]
+        check: [lint, format, ts]
     
     steps:
       - name: Checkout code
@@ -78,5 +78,5 @@ jobs:
           case ${{ matrix.check }} in
             lint) pnpm lint:check ;;
             format) pnpm format:check ;;
-            type) pnpm ts:check ;;
+            ts) pnpm ts:check ;;
           esac
