@@ -45,6 +45,7 @@ QuietDesk aims to be an AI-powered platform designed specifically for freelancer
 ### Core Technologies
 - TypeScript: ^5.8.2
 - AI Model: claude-3-7-sonnet-20250219 (fixed version)
+- Turborepo: ^2.5.2
 ### Frontend
 - Next.js: ^15.3.0
 - React: ^19.1.0
@@ -109,6 +110,8 @@ quietdesk/
 ### 3. Server State
 - Implement proper caching strategies
 - Use SWR or React Query for data fetching
+### 4. Environment Variables
+- Use turborepo's environment variable system
 
 ## Important Constraints
 1. **Version Management**
