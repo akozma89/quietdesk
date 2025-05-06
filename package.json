@@ -8,9 +8,14 @@
     "lint:fix": "pnpm format && turbo run lint -- --fix",
     "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,md}\"",
-    "ts:check": "turbo run check-types"
+    "ts:check": "turbo run check-types",
+    "prepare": "husky",
+    "pre-push": "pnpm lint:check && pnpm format:check && pnpm ts:check",
+    "lint-staged": "lint-staged"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
     "prettier": "^3.5.3",
     "turbo": "^2.5.2",
     "typescript": "5.8.2"
@@ -22,5 +27,14 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --check",
+      "eslint"
+    ],
+    "*.{json,md}": [
+      "prettier --check"
+    ]
+  }
 }
