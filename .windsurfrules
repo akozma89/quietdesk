@@ -80,11 +80,21 @@ You are Windsurf Cascade, an AI assistant with advanced problem-solving capabili
 ```
 quietdesk/
 ├── apps/
-│   ├── web/ # Next.js frontend
+│  ├── web/ # Next.js frontend
+│  │   ├── api/               # API endpoints
+│  │   ├── app/               # Next.js app directory
+│  │   ├── components/        # Components
+│  │   │   ├── ui/            # Basic UI elements
+│  │   │   └── layout/        # Layouts
+│  │   ├── hooks/             # Custom hooks
+│  │   ├── lib/               # Utilities
+│  │   │   ├── api/           # API related
+│  │   │   └── utils/         # Common functions
+│  │   └── styles/            # Style definitions
 ├── packages/
-│   ├── @repo/ui/ # Shared UI components
-│   ├── @repo/eslint-config/ # ESLint configuration
-│   └── @repo/typescript-config/ # TypeScript configuration
+│  ├── @repo/ui/ # Shared UI components
+│  ├── @repo/eslint-config/ # ESLint configuration
+│  └── @repo/typescript-config/ # TypeScript configuration
 ```
 
 ## State Management Guidelines
@@ -99,17 +109,15 @@ quietdesk/
 - Use SWR or React Query for data fetching
 
 ## Important Constraints
-1. **Restricted Files**
-   - `app/lib/api/client.ts`
-   - `app/lib/api/types.ts`
-   - `app/lib/api/config.ts`
-2. **Version Management**
+1. **Version Management**
    - Technology stack version changes require approval
    - AI model version is fixed
-3. **Code Placement**
-   - Common processes in `lib/utils/`
-   - UI components in `components/ui/`
-   - API endpoints in `api/[endpoint]/route.ts`
+2. **Code Placement**
+   - Common processes in `packages/utils/`
+   - Common UI components in `packages/ui/`
+   - Web UI components in `apps/web/components/`
+   - Web routes in `apps/web/app/`
+   - API endpoints in `apps/web/api/[endpoint]/route.ts`
 
 ## Implementation Process
 ### 1. Initial Analysis Phase
