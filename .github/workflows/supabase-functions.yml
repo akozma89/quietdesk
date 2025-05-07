@@ -15,4 +15,6 @@ jobs:
       - uses: supabase/setup-cli@v1
         with:
           version: latest
-      - run: supabase functions deploy hello-world --project-ref ${{ secrets.PROJECT_ID }} --no-verify-jwt
+      - run: >-
+          cd apps/supabase && supabase functions deploy hello-world --project-ref ${{ secrets.PROJECT_ID }}
+          --no-verify-jwt

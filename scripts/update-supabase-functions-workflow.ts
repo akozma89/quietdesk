@@ -93,7 +93,7 @@ function checkWorkflowSync(functions: FunctionConfig[]): boolean {
 
     const jwtFlag = func.jwt ? "" : "--no-verify-jwt";
     const expectedCommand =
-      `supabase functions deploy ${func.name} --project-ref \${{ secrets.PROJECT_ID }} ${jwtFlag}`.trim();
+      `cd apps/supabase && supabase functions deploy ${func.name} --project-ref \${{ secrets.PROJECT_ID }} ${jwtFlag}`.trim();
 
     if (step.run.trim() !== expectedCommand) {
       console.error(
@@ -122,7 +122,7 @@ function updateWorkflow(functions: FunctionConfig[]): void {
   functions.forEach((func) => {
     const jwtFlag = func.jwt ? "" : "--no-verify-jwt";
     updatedSteps.push({
-      run: `supabase functions deploy ${func.name} --project-ref \${{ secrets.PROJECT_ID }} ${jwtFlag}`.trim(),
+      run: `cd apps/supabase && supabase functions deploy ${func.name} --project-ref \${{ secrets.PROJECT_ID }} ${jwtFlag}`.trim(),
     });
   });
 
