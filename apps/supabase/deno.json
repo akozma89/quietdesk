@@ -1,0 +1,27 @@
+{
+  "tasks": {
+    "start": "supabase functions serve",
+    "deploy": "supabase functions deploy"
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "semiColons": false,
+    "singleQuote": true,
+    "proseWrap": "preserve"
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"],
+      "include": [
+        "ban-untagged-todo",
+        "no-unused-vars",
+        "no-explicit-any"
+      ]
+    }
+  },
+  "imports": {
+    "@supabase/functions-js": "jsr:@supabase/functions-js@^0.0.1"
+  }
+}

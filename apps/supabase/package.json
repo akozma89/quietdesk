@@ -1,0 +1,20 @@
+{
+  "name": "@repo/supabase",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "supabase functions serve --no-verify-jwt",
+    "lint": "eslint functions --ext .ts",
+    "lint:fix": "eslint functions --ext .ts --fix",
+    "ts:check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@supabase/functions-js": "^2.3.5",
+    "@types/node": "^20.11.30",
+    "eslint": "^9.26.0",
+    "supabase": "^1.148.6",
+    "typescript": "^5.8.2"
+  }
+}
