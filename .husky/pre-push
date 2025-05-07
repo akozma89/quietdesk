@@ -3,4 +3,4 @@
 
 # Run lint, format, and type checks before push
 echo "Running pre-push checks..."
-pnpm lint:check && pnpm format:check && pnpm ts:check
+pnpm pre-push

@@ -11,13 +11,19 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,md}\"",
     "ts:check": "turbo run ts:check",
     "prepare": "husky",
-    "pre-push": "pnpm lint:check && pnpm format:check && pnpm ts:check",
-    "lint-staged": "lint-staged"
+    "pre-push": "pnpm lint:check && pnpm format:check && pnpm ts:check && pnpm check-supabase-functions",
+    "lint-staged": "lint-staged",
+    "update-supabase-functions": "ts-node scripts/update-supabase-functions-workflow.ts",
+    "check-supabase-functions": "ts-node scripts/update-supabase-functions-workflow.ts --verify"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.11.30",
     "husky": "^9.1.7",
+    "js-yaml": "^4.1.0",
     "lint-staged": "^15.5.2",
     "prettier": "^3.5.3",
+    "ts-node": "^10.9.2",
     "turbo": "^2.5.2",
     "typescript": "5.8.2"
   },
