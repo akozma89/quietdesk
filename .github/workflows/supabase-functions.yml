@@ -2,7 +2,7 @@ name: Deploy Function
 'on':
   push:
     branches:
-      - main
+      - production
   workflow_dispatch: null
 jobs:
   deploy:
