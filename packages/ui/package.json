@@ -7,8 +7,9 @@
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --max-warnings 0 --fix",
     "generate:component": "turbo gen react-component",
-    "check-types": "tsc --noEmit"
+    "ts:check": "tsc --noEmit"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

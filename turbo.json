@@ -13,8 +13,11 @@
     "lint": {
       "dependsOn": ["^lint"]
     },
-    "check-types": {
-      "dependsOn": ["^check-types"]
+    "lint:fix": {
+      "dependsOn": ["^lint:fix"]
+    },
+    "ts:check": {
+      "dependsOn": ["^ts:check"]
     },
     "dev": {
       "cache": false,
