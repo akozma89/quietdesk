@@ -14,7 +14,10 @@
     "pre-push": "pnpm lint:check && pnpm format:check && pnpm ts:check && pnpm check-supabase-functions",
     "lint-staged": "lint-staged",
     "update-supabase-functions": "ts-node scripts/update-supabase-functions-workflow.ts",
-    "check-supabase-functions": "ts-node scripts/update-supabase-functions-workflow.ts --verify"
+    "check-supabase-functions": "ts-node scripts/update-supabase-functions-workflow.ts --verify",
+    "supabase:functions:new": "cd apps/supabase && supabase functions new",
+    "supabase:functions:deploy": "cd apps/supabase && supabase functions deploy",
+    "supabase:migration:new": "cd apps/supabase && supabase migration new"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",

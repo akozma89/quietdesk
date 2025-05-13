@@ -62,45 +62,58 @@ function checkWorkflowSync(functions: FunctionConfig[]): boolean {
   // Read the current workflow
   const workflow = readWorkflowConfig();
 
-  // Get the current deployment steps (excluding the initial setup steps)
-  const currentDeploySteps = workflow.jobs.deploy.steps.slice(2);
+  // Find the function deployment step by looking for steps with "Deploy Supabase functions" name
+  const deployFunctionSteps = workflow.jobs.deploy.steps.filter(
+    (step) => step.name === "Deploy Supabase functions",
+  );
 
-  // If the number of deployment steps doesn't match the number of functions, they're out of sync
-  if (currentDeploySteps.length !== functions.length) {
+  // If we don't have exactly one function deployment step, they're out of sync
+  if (deployFunctionSteps.length !== 1) {
     console.error(
-      `Mismatch detected: Workflow has ${currentDeploySteps.length} function deployments, but config has ${functions.length} functions`,
+      `Mismatch detected: Workflow has ${deployFunctionSteps.length} function deployment steps, but should have exactly 1`,
     );
     return false;
   }
 
-  // Check each function deployment step
-  for (let i = 0; i < functions.length; i++) {
-    const func = functions[i];
-    const step = currentDeploySteps[i];
+  // Check if the deployment step contains the correct function command
+  const deployStep = deployFunctionSteps[0];
+  if (!deployStep || !deployStep.run) {
+    console.error(
+      "Mismatch detected: Function deployment step is missing a run command",
+    );
+    return false;
+  }
 
-    if (!step || !step.run) {
-      console.error(
-        `Mismatch detected: Step ${i + 2} is missing a run command`,
-      );
-      return false;
-    }
+  // Check if the deployment step contains all the functions
+  const deployStepRun = deployStep.run.trim();
+  let allFunctionsIncluded = true;
 
-    // Ensure func is defined before using it
-    if (!func) {
-      console.error(`Mismatch detected: Function at index ${i} is undefined`);
-      return false;
-    }
+  // For now, we only support a single function in the workflow
+  // In the future, this could be expanded to support multiple functions
+  if (functions.length !== 1) {
+    console.error(
+      `Mismatch detected: Config has ${functions.length} functions, but workflow currently supports only 1`,
+    );
+    return false;
+  }
 
-    const jwtFlag = func.jwt ? "" : "--no-verify-jwt";
-    const expectedCommand =
-      `cd apps/supabase && supabase functions deploy ${func.name} --project-ref \${{ secrets.PROJECT_ID }} ${jwtFlag}`.trim();
+  const func = functions[0];
 
-    if (step.run.trim() !== expectedCommand) {
-      console.error(
-        `Mismatch detected for function '${func.name}':\nExpected: ${expectedCommand}\nActual: ${step.run.trim()}`,
-      );
-      return false;
-    }
+  // Ensure func is defined before using it
+  if (!func) {
+    console.error(`Mismatch detected: Function at index 0 is undefined`);
+    return false;
+  }
+
+  const jwtFlag = func.jwt ? "" : "--no-verify-jwt";
+  const expectedCommand =
+    `pnpm supabase:functions:deploy ${func.name} --project-ref \${{ secrets.PROJECT_ID }} ${jwtFlag}`.trim();
+
+  if (!deployStepRun.includes(expectedCommand)) {
+    console.error(
+      `Mismatch detected for function '${func.name}':\nExpected command not found in: ${deployStepRun}`,
+    );
+    return false;
   }
 
   // If we got here, everything is in sync
@@ -109,25 +122,81 @@ function checkWorkflowSync(functions: FunctionConfig[]): boolean {
 
 // Update the workflow file with function deployment steps
 function updateWorkflow(functions: FunctionConfig[]): void {
+  // Validate functions array
+  if (functions.length === 0) {
+    console.error("No functions defined in configuration");
+    process.exit(1);
+    return; // TypeScript needs this return
+  }
+
+  // Get the first function (we know it exists now)
+  const firstFunction = functions[0] as FunctionConfig;
+  const jwtFlag = firstFunction.jwt ? "" : "--no-verify-jwt";
+  const deployCommand =
+    `pnpm supabase:functions:deploy ${firstFunction.name} --project-ref \${{ secrets.PROJECT_ID }} ${jwtFlag}`.trim();
+
   // Read the current workflow
   const workflow = readWorkflowConfig();
 
-  // Keep the initial steps (checkout and setup)
-  const initialSteps = workflow.jobs.deploy.steps.slice(0, 2);
+  // Preserve the existing workflow structure
+  const existingSteps = workflow.jobs.deploy.steps;
 
-  // Create updated steps array with initial steps
-  const updatedSteps = [...initialSteps];
+  // Find the function deployment step index
+  const deployFunctionStepIndex = existingSteps.findIndex(
+    (step) => step.name === "Deploy Supabase functions",
+  );
 
-  // Add deployment steps for each function
-  functions.forEach((func) => {
-    const jwtFlag = func.jwt ? "" : "--no-verify-jwt";
-    updatedSteps.push({
-      run: `cd apps/supabase && supabase functions deploy ${func.name} --project-ref \${{ secrets.PROJECT_ID }} ${jwtFlag}`.trim(),
-    });
-  });
+  // If we couldn't find the deployment step, create a new workflow structure
+  if (deployFunctionStepIndex === -1) {
+    console.log("Creating new workflow structure with standard steps");
 
-  // Update the workflow with new steps
-  workflow.jobs.deploy.steps = updatedSteps;
+    // Create a standard workflow structure
+    workflow.jobs.deploy.steps = [
+      {
+        name: "Checkout repository",
+        uses: "actions/checkout@v4",
+      },
+      {
+        name: "Setup Node.js",
+        uses: "actions/setup-node@v4",
+        with: {
+          "node-version": 18,
+        },
+      },
+      {
+        name: "Setup pnpm",
+        uses: "pnpm/action-setup@v3",
+        with: {
+          version: "9.0.0",
+        },
+      },
+      {
+        name: "Install dependencies",
+        run: "pnpm install --frozen-lockfile",
+      },
+      {
+        name: "Setup Supabase CLI",
+        uses: "supabase/setup-cli@v1",
+        with: {
+          version: "latest",
+        },
+      },
+      {
+        name: "Run database migrations",
+        run: "cd apps/supabase && supabase db push --project-ref \${{ secrets.PROJECT_ID }}",
+      },
+      {
+        name: "Deploy Supabase functions",
+        run: deployCommand,
+      },
+    ];
+  } else {
+    // Update the existing deployment step
+    workflow.jobs.deploy.steps[deployFunctionStepIndex] = {
+      name: "Deploy Supabase functions",
+      run: deployCommand,
+    };
+  }
 
   // Write the updated workflow back to file
   try {
